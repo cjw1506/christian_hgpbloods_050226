@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Blood Tests</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/pbrW16N/apple-touch-icon.png">
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iI0ZGNDUzQSIvPjxwYXRoIGQ9Ik0xNCA4aDR2Nmg2djRoLTR2NmgLTRYtN																H8di-4hDZVOHoiIGZpbGw9IndoaXRlIi8vPjwvc3ZnPg==">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ios-blue: #0A84FF;
+            --ios-red: #FF453A;
+            --ios-green: #30D158;
+            --ios-orange: #FF9F0A;
+            --ios-purple: #BF5AF2;
+            --ios-pink: #FF375F;
+            --ios-teal: #208080;
+            --ios-yellow: #D4A017;
+            --ios-indigo: #5856D6;
+
+
+            /* Dark Mode Palette */
+            --ios-mid-gray: #3A3A3C;
+            --ios-dark-gray: #8e8e93;
+            
+            --ios-label-primary: #FFFFFF;
+            --ios-label-secondary: #ebebf599;
+            --ios-separator: #5454587a;
+            
+            --ios-background: #0D0D0F;
+            --ios-grouped-background: #1C1C1E; /* This is now mostly used as a fallback/base for rgba */
+            
+            --font-family-ios: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            --border-radius: 12px;
+            --grid-line-color: rgba(255, 255, 255, 0.1); /* Increased visibility */
+
+            /* NHS Blue Gradient for footer */
+            --nhs-blue-start: #0072CE; 
+            --nhs-blue-end: #005EB8;   
+
+            --header-height-initial: 60px;
+            --header-padding-initial: 12px 16px;
+            --header-title-font-initial: 1.5rem;
+
+            --header-height-compact: 48px;
+            --header-padding-compact: 8px 16px;
+            --header-title-font-compact: 1.2rem;
+        }
+
+        /* Basic Reset & Body Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            background-color: var(--ios-background);
+            background-image:
+                linear-gradient(to right, var(--ios-background) 0%, transparent 50%), /* New gradient */
+                linear-gradient(to right, var(--grid-line-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px; /* Adjust background-size for multiple images */
+            animation: animateGrid 60s linear infinite; /* Animated grid lines */
+        }
+
+        body {
+            font-family: var(--font-family-ios);
+            line-height: 1.4;
+            color: var(--ios-label-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            width: 60vmax;
+            height: 60vmax;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--ios-blue), transparent 60%);
+            opacity: 0.1;
+            filter: blur(100px);
+            z-index: -1;
+            pointer-events: none;
+            animation: moveGlow 30s ease-in-out infinite alternate; /* Slower animation, ease-in-out */
+        }
+
+        body::before {
+            top: -30%;
+            left: -30%;
+        }
+
+        body::after {
+            bottom: -30%;
+            right: -30%;
+            background: radial-gradient(circle, var(--ios-purple), transparent 60%);
+            animation-name: moveGlow2;
+            animation-duration: 35s; /* Slower animation */
+        }
+
+        /* Main App Container */
+        #root {
+            height: 100%;
+            position: relative;
+            z-index: 0;
+        }
+        
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            padding: 80px 1rem 60px; /* Adjusted bottom padding for fixed footer (halved) */
+        }
+
+        /* Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between; /* Space out title group and info button */
+            align-items: center;
+            gap: 16px;
+            padding: var(--header-padding-initial);
+            height: var(--header-height-initial);
+            background: linear-gradient(180deg, rgba(0, 114, 206, 0.25) 0%, rgba(0, 94, 184, 0.25) 100%); 
+            backdrop-filter: blur(30px); 
+            -webkit-backdrop-filter: blur(30px);
+            border-bottom: 0.5px solid var(--ios-separator);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3), inset 0 -1px 0 rgba(255,255,255,0.08); /* Outer and inner shadow */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            width: 100%;
+            transition: 
+                padding 0.3s ease-in-out, 
+                height 0.3s ease-in-out, 
+                backdrop-filter 0.3s ease-in-out, 
+                background 0.3s ease-in-out,
+                box-shadow 0.3s ease-in-out;
+            transform-style: preserve-3d; /* For layered elements */
+            perspective: 1000px; /* For 3D transforms */
+        }
+        
+        /* Header Glow Effect */
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px; /* Position below the header */
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            width: 80%; /* Adjust width of the glow */
+            height: 30px; /* Adjust height of the glow */
+            background: radial-gradient(ellipse at center, rgba(10, 132, 255, 0.3) 0%, transparent 70%); /* Blue glow */
+            filter: blur(20px);
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: -1;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .app-header.compact {
+            padding: var(--header-padding-compact);
+            height: var(--header-height-compact);
+            backdrop-filter: blur(45px); /* Stronger blur when compact */
+            -webkit-backdrop-filter: blur(45px);
+            background: linear-gradient(180deg, rgba(0, 114, 206, 0.4) 0%, rgba(0, 94, 184, 0.4) 100%); /* Slightly more opaque */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 -0.5px 0 rgba(255,255,255,0.1);
+        }
+        
+        .app-header.compact .header-icon {
+            transform: scale(0.9) translateZ(5px);
+        }
+
+        .app-header.compact h1 {
+            font-size: var(--header-title-font-compact);
+            transform: translateZ(4px);
+        }
+        
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-grow: 1; /* Allows it to take available space */
+            justify-content: center; /* Center the title group content */
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--ios-red);
+            position: relative;
+            z-index: 1;
+            transform: translateZ(10px); /* Perceived depth */
+            animation: pulseBreath 2s ease-in-out infinite alternate; /* Default idle animation */
+            transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out; /* For hover/tap */
+        }
+
+        .header-icon:hover, .header-icon:active {
+            transform: scale(1.1) translateZ(12px) rotate(0deg) hue-rotate(20deg); /* Scale, depth, and hue shift on interaction */
+            animation: spinOnHover 1.5s ease-out forwards; /* Activate spin on hover/tap */
+            cursor: pointer;
+        }
+
+        .header-icon svg {
+             width: 100%; height: 100%;
+        }
+
+        .app-header h1 {
+            font-size: var(--header-title-font-initial);
+            font-weight: 600;
+            color: var(--ios-label-primary); /* Back to white */
+            animation: floatSubtleHeaderTitle 3.5s ease-in-out infinite alternate; /* Keep float animation */
+            transition: font-size 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transform: translateZ(8px); /* Perceived depth */
+            white-space: nowrap; /* Prevent wrapping */
+        }
+        
+        .info-button {
+            background: none;
+            border: none;
+            color: var(--ios-label-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+            transform: translateZ(6px); /* Perceived depth */
+        }
+
+        .info-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05) translateZ(8px);
+        }
+
+        .info-button svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+
+        /* Popup Overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black backdrop */
+            backdrop-filter: blur(5px); /* Subtle blur for elements behind the popup */
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 99; /* Ensure it's above other content but below the popup */
+            animation: overlayFadeIn 0.2s ease-out forwards; /* Fade in the overlay */
+        }
+
+        /* Styling for the new clinical-popup structure */
+        .clinical-popup {
+            max-width: 480px; 
+            min-width: 300px;
+            background-color: rgba(28, 28, 30, 0.98); 
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 0.5px solid var(--ios-separator);
+            border-radius: var(--border-radius);
+            padding: 20px 25px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05); 
+            color: rgba(255, 255, 255, 0.75); /* More subtle white for general text */
+            font-size: 0.95rem; 
+            line-height: 1.4; 
+            z-index: 100; 
+            animation: popupFadeIn 0.2s ease-out forwards;
+        }
+
+        .clinical-popup h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--ios-label-primary);
+            white-space: pre-wrap;
+        }
+
+        .clinical-popup p {
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            color: inherit;
+        }
+
+        .clinical-popup p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .clinical-popup strong {
+            color: var(--ios-label-primary); /* Ensure strong text is brighter white */
+        }
+
+        .clinical-popup .main-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            color: var(--ios-label-primary);
+        }
+
+        .clinical-popup .sub-list {
+            list-style: none; /* Remove default bullets from nested lists */
+            margin: 0;
+            padding: 0;
+            margin-left: 15px; /* Indent sub-lists */
+            margin-bottom: 20px; /* Space after each main section's list */
+        }
+
+        .clinical-popup .sub-list li {
+            margin-bottom: 15px;
+            padding: 0;
+        }
+
+        .clinical-popup .sub-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .clinical-popup .sub-section-title {
+            font-size: 0.98rem; /* Slightly smaller than main section title */
+            font-weight: 600;
+            color: var(--ios-label-primary);
+            margin-top: 0;
+            margin-bottom: 5px; /* Space between sub-section title and its paragraph */
+        }
+
+        .clinical-popup .important-marker {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .clinical-popup .important-marker svg {
+            width: 1em;
+            height: 1em;
+            flex-shrink: 0;
+            margin-top: -1px;
+        }
+
+        .clinical-popup .important-label {
+            font-weight: 700;
+            color: #FF453A !important; /* Force red color */
+            white-space: nowrap;
+        }
+
+        .clinical-popup .indented-quote {
+            display: block; /* Ensure it takes full width and new line */
+            padding-left: 20px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 5px;
+        }
+
+        .clinical-popup .section-divider {
+            border: none;
+            border-top: 0.5px solid rgba(84, 84, 88, 0.4);
+            margin: 20px 0;
+        }
+
+        .clinical-popup .footer-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ios-label-primary);
+            margin-bottom: 8px;
+        }
+
+        .clinical-popup .disclaimer-text {
+            font-size: 0.8rem;
+            color: rgba(142, 142, 147, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .clinical-popup .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end; /* Align button to the right */
+            margin-top: 15px;
+            margin-bottom: 15px; /* Added spacing below action buttons */
+        }
+
+        .clinical-popup .actions button {
+            border: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+            -webkit-tap-highlight-color: transparent;
+            color: white; /* Default text color for buttons */
+        }
+        
+        .clinical-popup .actions button strong {
+            color: inherit; /* Ensure strong tag inherits button text color */
+        }
+
+        .clinical-popup .actions .confirm-button {
+            background: linear-gradient(160deg, var(--ios-green), #20B24A); /* Green gradient */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .clinical-popup .actions .confirm-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            filter: brightness(1.05);
+        }
+
+        /* New disclaimer style */
+        .clinical-popup .edited-by-disclaimer {
+            font-size: 0.7rem; /* Smaller font size */
+            color: var(--ios-label-primary); /* White text */
+            text-align: right;
+            border-top: 0.5px solid rgba(255, 255, 255, 0.05);
+            padding-top: 6px; 
+            margin-top: 10px; /* Space above disclaimer */
+            white-space: nowrap; /* Prevent wrapping of the disclaimer text */
+        }
+        
+        .clinical-popup .edited-by-disclaimer #current-date-placeholder {
+            font-weight: 500; /* Make the date slightly bolder */
+            color: rgba(255, 255, 255, 0.8); /* Slightly more visible date color */
+        }
+
+
+        .button-reset {
+            border: none;
+            font-size: 1rem;
+            font-weight: 400; /* Default font weight */
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+            -webkit-tap-highlight-color: transparent;
+            background: transparent;
+            color: var(--ios-red);
+        }
+
+        .button-reset:disabled {
+            color: var(--ios-dark-gray);
+            cursor: not-allowed;
+            background: transparent;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .button-reset:not(:disabled) {
+            background: linear-gradient(160deg, #FF5B52, #D92525);
+            color: white;
+            font-weight: 500; /* Adjusted to 500 when active */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .button-reset:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            filter: brightness(1.05);
+            background: linear-gradient(140deg, #FF5B52, #D92525);
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            flex: 1;
+            margin-top: 24px;
+        }
+
+        /* iOS-style Grouped List / Card */
+        .card {
+            background-color: rgba(28, 28, 30, 0.85); /* Adjusted for more depth */
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            border: 0.5px solid rgba(84, 84, 88, 0.65);
+            backdrop-filter: blur(35px); /* Adjusted for more depth */
+            -webkit-backdrop-filter: blur(35px); /* Adjusted for more depth */
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); /* Subtle inner shadow */
+        }
+
+        .card-header {
+            padding: 12px 16px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            background-color: rgba(28, 28, 30, 0.6); /* Adjusted for more depth */
+            backdrop-filter: blur(30px); /* Adjusted for more depth */
+            -webkit-backdrop-filter: blur(30px); /* Adjusted for more depth */
+            border-bottom: 0.5px solid var(--ios-separator);
+            display: flex; /* Added flex for alignment */
+            justify-content: space-between; /* Space out title and button */
+            align-items: center;
+        }
+
+        .list-group {
+            list-style: none;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            position: relative;
+            gap: 12px;
+            transition: transform 0.2s ease-out, background-color 0.2s ease-out;
+        }
+        .list-item:hover {
+            transform: translateY(-2px); /* Slightly more pronounced */
+            background-color: rgba(255, 255, 255, 0.05); /* Slightly stronger hover effect */
+            z-index: 1;
+        }
+        
+        .list-group > .list-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            height: 0.5px;
+            background-color: var(--ios-separator);
+            left: 58px; /* Inset past icon */
+        }
+        
+        .list-item:has(~ .additional-info-item.visible)::after, /* This needs to be correctly referenced for the condition */
+        .list-item:has(+ .additional-info-item.visible)::after { /* And this */
+            display: none;
+        }
+
+
+        .list-item-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .list-item-icon {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: var(--ios-label-primary);
+            font-size: 0.9rem;
+            font-weight: 400; /* Changed from 700 to 400 */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Added subtle border */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Added subtle shadow */
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+        }
+        .list-item:hover .list-item-icon {
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Icon Colors */
+        .list-item-icon.icon-red { background-color: var(--ios-red); }
+        .list-item-icon.icon-pink { background-color: var(--ios-pink); }
+        .list-item-icon.icon-orange { background-color: var(--ios-orange); }
+        .list-item-icon.icon-purple { background-color: var(--ios-purple); }
+        .list-item-icon.icon-teal { background-color: var(--ios-teal); }
+        .list-item-icon.icon-blue { background-color: var(--ios-blue); }
+        .list-item-icon.icon-green { background-color: var(--ios-green); }
+        .list-item-icon.icon-yellow { background-color: var(--ios-yellow); }
+
+        .list-item-label {
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        /* iOS Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--ios-mid-gray);
+            transition: .2s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        input:checked + .slider {
+            background-color: var(--ios-green);
+        }
+
+        input:focus-visible + .slider {
+            box-shadow: 0 0 0 2px var(--ios-background), 0 0 0 4px var(--ios-blue);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px) scale(1.05); /* Added scale animation on check */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Slightly stronger shadow on check */
+        }
+        
+        /* Additional Info Item (slide-down) */
+        .additional-info-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 16px;
+            margin: 0;
+            opacity: 0;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out, opacity 0.3s ease-out, border-top-color 0.2s ease-out, border-bottom-color 0.2s ease-out;
+            background-color: rgba(44, 44, 46, 0.75); /* Frosted glass base, slightly more opaque */
+            border-top: 2px solid transparent;
+            border-bottom: 2px solid transparent;
+            backdrop-filter: blur(15px); /* Adjusted for more depth */
+            -webkit-backdrop-filter: blur(15px); /* Adjusted for more depth */
+        }
+
+        .additional-info-item.visible {
+            max-height: 80px;
+            opacity: 1;
+            padding-top: 12px;
+            padding-bottom: 12px;
+            background-color: rgba(255, 69, 58, 0.15); /* Semi-transparent red background */
+            border-top-color: var(--ios-red); /* Red border */
+            border-bottom-color: var(--ios-red); /* Red border */
+        }
+
+        .additional-info-item .question-icon {
+            color: var(--ios-label-secondary);
+        }
+        
+        .additional-info-item .question-icon svg {
+             fill: currentColor;
+        }
+        
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper select {
+            color: var(--ios-label-primary);
+            padding: 10px 40px 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--ios-red); /* Default red border */
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: linear-gradient(to bottom, #4a4a4c, #3A3A3C), 
+                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EBEBF599' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 5 18 9'%3E%3C/polyline%3E%3Cpolyline points='6 15 12 19 18 15'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center, right 14px center;
+            background-size: auto, 14px 14px;
+            cursor: pointer;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .select-wrapper select:hover {
+            border-color: var(--ios-red); /* Red border on hover */
+            box-shadow: 0 0 0 2px rgba(255, 69, 58, 0.2); /* Subtle red glow on hover */
+        }
+
+        .select-wrapper select:focus {
+            outline: none;
+            border-color: var(--ios-red); /* Red border on focus */
+            box-shadow: 0 0 0 2px rgba(255, 69, 58, 0.4); /* Stronger red glow on focus */
+        }
+
+        .select-wrapper select option {
+            color: var(--ios-label-primary);
+            background: var(--ios-grouped-background);
+            text-align: left;
+        }
+
+        /* Results Panel */
+        .results-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+            color: var(--ios-dark-gray);
+            padding: 40px 20px;
+            min-height: 150px;
+        }
+        .placeholder-icon {
+            width: 48px;
+            height: 48px;
+            color: var(--ios-mid-gray);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .results-list { 
+            padding: 8px; 
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            /* Updated gradient for more visibility and volumetric effect */
+            background: linear-gradient(135deg, rgba(120, 180, 255, 0.08) 0%, rgba(180, 120, 255, 0.12) 100%); 
+            backdrop-filter: blur(10px); /* Subtle blur for glass effect */
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Crisper border for glass */
+            box-shadow: 
+                inset 0 1px 4px rgba(255, 255, 255, 0.15), /* Inner highlight from top-left */
+                0 4px 15px rgba(0, 0, 0, 0.3); /* Outer shadow for depth */
+            animation: fadeIn 0.4s ease-out forwards; /* Smoother fade-in */
+            opacity: 0;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .result-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                inset 0 1px 4px rgba(255, 255, 255, 0.2), 
+                0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .test-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .result-category {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ios-label-secondary);
+            position: relative; /* For 3D context of children */
+            transform-style: preserve-3d;
+        }
+
+        .category-header .category-icon {
+            transform: translateZ(2px); /* Give perceived depth */
+            animation: floatSubtle 3s ease-in-out infinite alternate; /* Subtle float animation */
+        }
+        .category-header span { /* Target the text inside category-header */
+            transform: translateZ(1px); /* Slightly less pronounced for text */
+            animation: floatSubtle 3s ease-in-out infinite alternate; /* Subtle float animation */
+            animation-delay: 0.2s; /* Stagger text float */
+        }
+
+
+        .category-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .category-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .monitoring-icon {
+            color: var(--ios-red);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .diagnostic-icon {
+            color: var(--ios-blue);
+        }
+
+        .frequencies-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-left: 20px; /* Adjusted padding for pseudo-element */
+            margin-left: 9px;
+            position: relative; /* For pseudo-element positioning */
+        }
+
+        .frequencies-container::before {
+            content: '';
+            position: absolute;
+            left: 0; /* Position the line at the very left edge of the container */
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--ios-blue), var(--ios-purple)); /* Glowing gradient */
+            box-shadow: 0 0 8px var(--ios-blue), 0 0 15px var(--ios-purple); /* For glow effect */
+            animation: pulseGlowLine 4s ease-in-out infinite alternate;
+        }
+
+        .frequency-group {
+            display: flex;
+            flex-direction: column; /* Changed to column to stack frequency and diseases */
+            align-items: flex-start; /* Align items to the start for better stacking */
+            gap: 4px; /* Reduced gap for closer stacking */
+        }
+
+        .frequency-tag {
+            display: inline-block;
+            padding: 4px 10px; /* Increased padding */
+            border-radius: 8px; /* Slightly larger border-radius */
+            font-size: 0.85rem; /* Slightly larger font */
+            font-weight: 600; /* Bolder font weight */
+            color: #fff;
+            white-space: nowrap;
+            background-size: 200% auto; /* For gradient animation */
+            animation: gradientSlide 4s linear infinite alternate; /* Dynamic gradient background */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); /* Enhanced shadow and inner highlight */
+            transform: perspective(500px) translateZ(0); /* For hardware acceleration and 3D transforms */
+            transition: all 0.2s ease-out;
+        }
+        .frequency-tag:hover {
+            transform: translateY(-4px) rotateY(10deg) scale(1.05) translateZ(10px); /* More pronounced 3D hover */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3); /* Stronger shadow and inner highlight */
+        }
+        
+        /* Specific color gradients and darker borders for frequency tags */
+        .frequency-tag.tag-red { 
+            background: linear-gradient(145deg, #FF6F61 0%, var(--ios-red) 100%);
+            border: 1px solid #C43B33; /* Darker red */
+        }
+        .frequency-tag.tag-green {
+            background: linear-gradient(145deg, #4FE373 0%, var(--ios-green) 100%);
+            border: 1px solid #28B34A; /* Darker green */
+        }
+        .frequency-tag.tag-purple {
+            background: linear-gradient(145deg, #E082FF 0%, var(--ios-purple) 100%);
+            border: 1px solid #9D48CC; /* Darker purple */
+        }
+        .frequency-tag.tag-indigo {
+            background: linear-gradient(145deg, #7A78FF 0%, var(--ios-indigo) 100%);
+            border: 1.5px solid #4D4BB8; /* Darker indigo */
+        }
+        .frequency-tag.tag-pink {
+            background: linear-gradient(145deg, #FF6F8F 0%, var(--ios-pink) 100%);
+            border: 1px solid #D93050; /* Darker pink */
+        }
+        .frequency-tag.tag-teal {
+            background: linear-gradient(145deg, #3EB0B0 0%, var(--ios-teal) 100%);
+            border: 1px solid #1A6C6C; /* Darker teal */
+        }
+        .frequency-tag.tag-yellow {
+            background: linear-gradient(145deg, #FFE873 0%, var(--ios-yellow) 100%);
+            border: 1px solid #A8811A; /* Darker yellow */
+        }
+        .frequency-tag.tag-orange {
+            background: linear-gradient(145deg, #FFBF5A 0%, var(--ios-orange) 100%);
+            border: 1px solid #D48008; /* Darker orange */
+        }
+        .frequency-tag.tag-blue {
+            background: linear-gradient(145deg, #4AABFF 0%, var(--ios-blue) 100%);
+            border: 1px solid #086AB3; /* Darker blue */
+        }
+        .frequency-tag.tag-gray {
+            background: linear-gradient(145deg, #AAAAAA 0%, var(--ios-dark-gray) 100%);
+            border: 1px solid #737378; /* Darker gray */
+        }
+
+        .disease-info {
+            font-size: 0.9rem;
+            color: var(--ios-label-secondary);
+            animation: fadeInUp 0.5s ease-out forwards; /* Fade-in effect */
+            opacity: 0; /* Hidden by default, animated to visible */
+            animation-delay: 0.1s; /* Slight delay after frequency tag */
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 16px 16px; /* Reduced padding to halve height */
+            color: var(--ios-label-primary); /* More prominent color */
+            font-size: 1rem; /* Larger font size */
+            font-weight: 500; /* Bolder font weight */
+            /* Updated background for more transparency and a subtle blue tint */
+            background: linear-gradient(180deg, rgba(0, 114, 206, 0.25) 0%, rgba(0, 94, 184, 0.25) 100%); 
+            backdrop-filter: blur(30px); /* Increased blur for stronger glass effect */
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 0.5px solid rgba(255, 255, 255, 0.2); /* Subtle border top for contrast */
+            position: fixed; /* Make it fixed */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10; /* Ensure it's above other content */
+        }
+
+        .app-footer .footer-text {
+            position: relative; /* For positioning pseudo-elements */
+            display: inline-block; /* Essential for pseudo-elements to respect content width */
+            padding: 0 20px; /* Give some space for stars */
+            overflow: visible; /* Allow stars to animate outside padding */
+            z-index: 1; /* Ensure text is above stars if stars have a lower z-index for some reason */
+        }
+
+        .app-footer .footer-text::before,
+        .app-footer .footer-text::after {
+            content: "";
+            position: absolute;
+            width: 16px; /* Size of the star */
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFD700'%3E%3Cpath d='M12 2l1.503 4.542 4.896.711-3.548 3.457.839 4.879L12 16.484l-4.29 2.255.839-4.879-3.548-3.457 4.896-.711L12 2z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.7)) drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+            pointer-events: none; /* Allows clicks to pass through */
+            z-index: 0; /* Stars slightly behind the text for subtle effect */
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%); /* Adjust for vertical centering */
+        }
+
+        .app-footer .footer-text::before {
+            left: -18px; /* Initial position relative to the left of the text span */
+            animation: starAnimationLeft 4s ease-in-out infinite alternate;
+            animation-delay: 0.1s;
+        }
+
+        .app-footer .footer-text::after {
+            right: -18px; /* Initial position relative to the right of the text span */
+            animation: starAnimationRight 4s ease-in-out infinite alternate;
+            animation-delay: 2s;
+        }
+
+        .app-footer a {
+            color: var(--ios-label-primary); /* Link color also primary */
+            font-weight: 700; /* Bolded link */
+            text-decoration: none;
+            transition: color 0.2s ease-in-out, text-decoration 0.2s ease-in-out;
+        }
+
+        .app-footer a:hover {
+            text-decoration: underline;
+            color: rgba(255, 255, 255, 0.8); /* Slight fade on hover for contrast on blue */
+        }
+
+
+        /* Desktop Layout */
+        @media (min-width: 800px) {
+            .app-container {
+                max-width: 1100px;
+            }
+            .main-content {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+            }
+        }
+
+        /* Responsive Adjustments (Mobile) */
+        @media (max-width: 799px) {
+            .app-container {
+                padding: 80px 1rem 60px; /* Also for mobile, adjusted for footer */
+            }
+            .main-content {
+                margin-top: 16px;
+            }
+             .card:first-of-type {
+                 border-top: 0.5px solid rgba(84, 84, 88, 0.65);
+             }
+        }
+
+        /* Animation Keyframes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes shimmer {
+            0%, 100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            50% {
+                transform: scale(1.2);
+                filter: brightness(1.5);
+            }
+        }
+
+        @keyframes pulseBreath {
+            0%, 100% {
+                transform: translateZ(10px) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateZ(12px) scale(1.05);
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes spinOnHover {
+            0% { transform: scale(1.1) translateZ(12px) rotate(0deg) hue-rotate(0deg); }
+            100% { transform: scale(1.1) translateZ(12px) rotate(360deg) hue-rotate(20deg); }
+        }
+
+        /* Animated Grid */
+        @keyframes animateGrid {
+            from { background-position: 0 0; }
+            to { background-position: 30px 30px; } /* Shifts one full grid cell */
+        }
+
+
+        @keyframes moveGlow {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                filter: blur(100px) hue-rotate(0deg);
+            }
+            25% {
+                transform: translate(180px, 90px) scale(1.1) rotate(30deg);
+                filter: blur(110px) hue-rotate(5deg);
+            }
+            50% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                filter: blur(100px) hue-rotate(0deg);
+            }
+            75% {
+                transform: translate(-120px, 60px) scale(0.95) rotate(-20deg);
+                filter: blur(95px) hue-rotate(-5deg);
+            }
+            100% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                filter: blur(100px) hue-rotate(0deg);
+            }
+        }
+
+        @keyframes moveGlow2 {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                filter: blur(100px) hue-rotate(0deg);
+            }
+            25% {
+                transform: translate(-90px, -180px) scale(1.1) rotate(-40deg);
+                filter: blur(105px) hue-rotate(8deg);
+            }
+            50% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                filter: blur(100px) hue-rotate(0deg);
+            }
+            75% {
+                transform: translate(150px, -70px) scale(0.9) rotate(25deg);
+                filter: blur(90px) hue-rotate(-3deg);
+            }
+            100% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                filter: blur(100px) hue-rotate(0deg);
+            }
+        }
+        
+        /* Combined animation keyframes for stars */
+        @keyframes starAnimationLeft {
+            0%, 100% {
+                opacity: 0.6;
+                transform: translateY(-50%) translateX(0px) scale(0.8) rotate(0deg);
+            }
+            25% {
+                opacity: 0.8;
+                transform: translateY(calc(-50% - 2px)) translateX(-5px) scale(0.9) rotate(5deg);
+            }
+            50% {
+                opacity: 1.1; /* Peak twinkle */
+                transform: translateY(-50%) translateX(0px) scale(1.2) rotate(0deg);
+            }
+            75% {
+                opacity: 0.8;
+                transform: translateY(calc(-50% + 2px)) translateX(5px) scale(0.9) rotate(-5deg);
+            }
+        }
+
+        @keyframes starAnimationRight {
+            0%, 100% {
+                opacity: 0.6;
+                transform: translateY(-50%) translateX(0px) scale(0.8) rotate(0deg);
+            }
+            25% {
+                opacity: 0.8;
+                transform: translateY(calc(-50% - 2px)) translateX(5px) scale(0.9) rotate(-5deg);
+            }
+            50% {
+                opacity: 1.1; /* Peak twinkle */
+                transform: translateY(-50%) translateX(0px) scale(1.2) rotate(0deg);
+            }
+            75% {
+                opacity: 0.8;
+                transform: translateY(calc(-50% + 2px)) translateX(-5px) scale(0.9) rotate(5deg);
+            }
+        }
+
+        /* Subtle float animation for category headers */
+        @keyframes floatSubtle {
+            0%, 100% { transform: translateY(0px) translateZ(var(--float-z, 0px)); }
+            50% { transform: translateY(-2px) translateZ(var(--float-z, 0px)); }
+        }
+
+        @keyframes floatSubtleHeaderTitle {
+            0%, 100% { transform: translateZ(8px) translateY(0px); }
+            50% { transform: translateZ(9px) translateY(-1px); }
+        }
+
+        @keyframes floatSubtleHeaderIcon {
+            0%, 100% { transform: translateZ(10px) translateY(0px); }
+            50% { transform: translateZ(11px) translateY(-1px); }
+        }
+
+        /* Pulse glow for frequencies container line */
+        @keyframes pulseGlowLine {
+            0%, 100% { opacity: 0.7; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.02); } /* Subtle pulse */
+        }
+
+        @keyframes gradientSlide {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Animation for popup */
+        @keyframes popupFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Animation for overlay */
+        @keyframes overlayFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="/index.js"></script>
+</body>
+</html>
