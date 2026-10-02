@@ -1,0 +1,5 @@
+{
+  "name": "Remix: HGP Blood Test Allocator",
+  "description": "A clinical tool for medical staff to determine required blood tests based on patient conditions and medications.",
+  "requestFramePermissions": []
+}
